@@ -10,6 +10,7 @@ UBTTask_ScorpionSelectTarget::UBTTask_ScorpionSelectTarget()
 	NodeName = TEXT("Scorpion Select Target");
 }
 
+// Task to evaluate next target point the scorpion should move to.
 EBTNodeResult::Type UBTTask_ScorpionSelectTarget::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
 {
 	AScorpionAIController * scorpionAI = Cast<AScorpionAIController>(OwnerComp.GetAIOwner());

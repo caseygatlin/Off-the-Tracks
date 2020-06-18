@@ -13,6 +13,7 @@ UBTService_SetBoolOnTimer::UBTService_SetBoolOnTimer()
 	BlackboardKey.AddBoolFilter(this, GET_MEMBER_NAME_CHECKED(UBTService_SetBoolOnTimer, BlackboardKey));
 }
 
+// Will tick for delta seconds and then set bool for owning ai controllers blackboard value to true
 void UBTService_SetBoolOnTimer::TickNode(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory, float DeltaSeconds)
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);

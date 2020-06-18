@@ -11,6 +11,7 @@ UBTTask_MoveToBBObject::UBTTask_MoveToBBObject()
 	_ObjectKey.AddObjectFilter(this, GET_MEMBER_NAME_CHECKED(UBTTask_MoveToBBObject, _ObjectKey), UObject::StaticClass());
 }
 
+// Will move to selected blackboard object. Can specify it should be set or not.
 void UBTTask_MoveToBBObject::TickTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory, float DeltaSeconds)
 {
 	AEnemyAIController * const enemyAI = Cast<AEnemyAIController>(OwnerComp.GetAIOwner());

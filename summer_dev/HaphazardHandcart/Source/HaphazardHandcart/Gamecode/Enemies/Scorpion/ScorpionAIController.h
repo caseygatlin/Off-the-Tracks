@@ -22,13 +22,6 @@ public:
 	// Set the target point in the blackboard data
 	void EvaulateNextTargetPoint();
 
-#pragma region Attack
-
-	UFUNCTION(BlueprintCallable, Category = "Enemies|Scorpion|Attack")
-		bool TailAttack();
-
-#pragma endregion
-
 #pragma region Getters and Setters
 
 	UFUNCTION(BlueprintCallable, Category = "Enemies|BlackboardKeys")

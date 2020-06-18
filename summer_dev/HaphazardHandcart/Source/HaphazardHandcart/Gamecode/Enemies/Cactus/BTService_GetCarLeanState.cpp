@@ -18,6 +18,7 @@ UBTService_GetCarLeanState::UBTService_GetCarLeanState()
 	CarLeanStateKey.AddEnumFilter(this, GET_MEMBER_NAME_CHECKED(UBTService_GetCarLeanState, HandcarKey), StaticEnum<E_CartLeanState>());
 }
 
+// Task to get the current lean state of the player handcar and then set the relevant blackboard key
 void UBTService_GetCarLeanState::TickNode(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory, float DeltaSeconds)
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);

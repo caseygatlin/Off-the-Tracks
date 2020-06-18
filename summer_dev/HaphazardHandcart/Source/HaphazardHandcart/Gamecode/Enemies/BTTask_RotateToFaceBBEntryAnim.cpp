@@ -24,6 +24,7 @@ namespace
 	}
 }
 
+// Task that rotates an AI while also playing an animation.
 EBTNodeResult::Type UBTTask_RotateToFaceBBEntryAnim::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
 {
 	AAIController * AIController = OwnerComp.GetAIOwner();
@@ -36,6 +37,7 @@ EBTNodeResult::Type UBTTask_RotateToFaceBBEntryAnim::ExecuteTask(UBehaviorTreeCo
 
 	float angleDifference = 0.0f;
 
+	// uses same logic as UBTTask_RotateToFaceBBEntry to calculate angle difference
 	if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Object::StaticClass())
 	{
 		AActor* ActorValue = Cast<AActor>(MyBlackboard->GetValue<UBlackboardKeyType_Object>(BlackboardKey.GetSelectedKeyID()));

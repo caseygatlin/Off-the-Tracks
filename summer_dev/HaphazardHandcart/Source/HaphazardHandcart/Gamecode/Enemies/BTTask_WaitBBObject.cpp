@@ -11,6 +11,7 @@ UBTTask_WaitBBObject::UBTTask_WaitBBObject()
 	_ObjectKey.AddObjectFilter(this, GET_MEMBER_NAME_CHECKED(UBTTask_WaitBBObject, _ObjectKey), UObject::StaticClass());
 }
 
+// Tasks ticks for a time frame unless the object is no longer set or unset based on starting conditions of whether is should be or not.
 void UBTTask_WaitBBObject::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	AEnemyAIController * const enemyAI = Cast<AEnemyAIController>(OwnerComp.GetAIOwner());

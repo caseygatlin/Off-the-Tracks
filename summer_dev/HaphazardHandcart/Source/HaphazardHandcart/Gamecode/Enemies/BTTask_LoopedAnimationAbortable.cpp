@@ -23,7 +23,7 @@ void UBTTask_LoopedAnimationAbortable::TickTask(UBehaviorTreeComponent & OwnerCo
 
 	UObject * selectedBlackBoardObj = enemyAI->GetBlackboardComp()->GetValueAsObject(_ObjectKey.SelectedKeyName);
 
-	// if the blackboard object for the playerhandcar is not set when it should be
+	// if the blackboard object for the target is not set when it should be
 	if (_IsValueSet)
 	{
 		if (selectedBlackBoardObj == nullptr)
@@ -32,7 +32,7 @@ void UBTTask_LoopedAnimationAbortable::TickTask(UBehaviorTreeComponent & OwnerCo
 			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 		}
 	}
-	// if the blackboard object for the playerhandcar is not set when it shouldn't be
+	// if the blackboard object for the target is not set when it shouldn't be
 	else
 	{
 		if (selectedBlackBoardObj != nullptr)
@@ -45,19 +45,21 @@ void UBTTask_LoopedAnimationAbortable::TickTask(UBehaviorTreeComponent & OwnerCo
 
 void UBTTask_LoopedAnimationAbortable::CleanUp(UBehaviorTreeComponent & OwnerComp)
 {
+	// reset the cached animation mode
 	if (_CachedSkelMesh != nullptr && _PreviousAnimationMode == EAnimationMode::AnimationBlueprint)
 	{
 		_CachedSkelMesh->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	}
 }
 
+// Will play loop based animation while blackboard object is set (can be aborted).
 EBTNodeResult::Type UBTTask_LoopedAnimationAbortable::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
 {
 	AEnemyAIController * const enemyAI = Cast<AEnemyAIController>(OwnerComp.GetAIOwner());
 
 	UObject * selectedBlackBoardObj = enemyAI->GetBlackboardComp()->GetValueAsObject(_ObjectKey.SelectedKeyName);
 
-	// if the blackboard object for the playerhandcar is not set when it should be
+	// if the blackboard object for the target is not set when it should be
 	if (_IsValueSet)
 	{
 		if (selectedBlackBoardObj == nullptr)
@@ -66,7 +68,7 @@ EBTNodeResult::Type UBTTask_LoopedAnimationAbortable::ExecuteTask(UBehaviorTreeC
 			return EBTNodeResult::Failed;
 		}
 	}
-	// if the blackboard object for the playerhandcar is not set when it shouldn't be
+	// if the blackboard object for the target is not set when it shouldn't be
 	else
 	{
 		if (selectedBlackBoardObj != nullptr)
@@ -82,9 +84,11 @@ EBTNodeResult::Type UBTTask_LoopedAnimationAbortable::ExecuteTask(UBehaviorTreeC
 
 		if (SkelMesh != nullptr)
 		{
+			// store cached reference to animation mode
 			_PreviousAnimationMode = SkelMesh->GetAnimationMode();
 			_CachedSkelMesh = SkelMesh;
 
+			// play the selected animation and set in progress if time is left on animation loop
 			SkelMesh->PlayAnimation(_AnimationToPlay, true);
 			const float FinishDelay = _AnimationToPlay->GetMaxCurrentTime();
 

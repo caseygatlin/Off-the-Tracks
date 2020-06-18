@@ -26,6 +26,7 @@ void UBTTask_LaunchSpike::CleanUp(UBehaviorTreeComponent & OwnerComp)
 	}
 }
 
+// Task to launch a spike at the player. Will fire on right or left side based on the car's leanstate. 
 EBTNodeResult::Type UBTTask_LaunchSpike::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
@@ -52,6 +53,7 @@ EBTNodeResult::Type UBTTask_LaunchSpike::ExecuteTask(UBehaviorTreeComponent & Ow
 					FVector forwardVectorCactus = cactusAI->GetPawn()->GetActorForwardVector();
 					FVector forwardVectorHandcar = playerHandcar->GetActorForwardVector();
 
+					// uses dotproduct to determine if we should fire on left or right side
 					if (FVector::DotProduct(forwardVectorCactus, forwardVectorHandcar) < 0)
 					{
 						cactus->SetCactusFireLane(E_CactusFireLane::LEFT);
@@ -69,6 +71,7 @@ EBTNodeResult::Type UBTTask_LaunchSpike::ExecuteTask(UBehaviorTreeComponent & Ow
 					FVector forwardVectorCactus = cactusAI->GetPawn()->GetActorForwardVector();
 					FVector forwardVectorHandcar = playerHandcar->GetActorForwardVector();
 
+					// uses dotproduct to determine if we should fire on left or right side
 					if (FVector::DotProduct(forwardVectorCactus, forwardVectorHandcar) < 0)
 					{
 						cactus->SetCactusFireLane(E_CactusFireLane::RIGHT);
@@ -101,8 +104,10 @@ EBTNodeResult::Type UBTTask_LaunchSpike::ExecuteTask(UBehaviorTreeComponent & Ow
 			_CachedSkelMesh = SkelMesh;
 		}
 
+		// fire a spike that uses info we set for spawn location
 		if (cactusAI->FireSpike(_LeftFireAnimation, _RightFireAnimation))
 		{
+			// set blackboard key that we can fire to false
 			cactusAI->GetBlackboardComp()->SetValueAsBool(m_CanFireKey.SelectedKeyName, false);
 			return EBTNodeResult::Succeeded;
 		}

@@ -89,8 +89,9 @@ void ASpikeProjectile::BeginOverlap(UPrimitiveComponent * OverlappedComponent, A
 
 		UGameplayStatics::PlaySound2D(this, m_SpikeHitSound);
 
+		// slow down the hit player handcar and apply camera shake
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_SpikeExplosionParticle, GetActorLocation());
-		playerHandcar->SlowdownPlayer(m_SlowdownTime, m_SlowStrength);\
+		playerHandcar->SlowdownPlayer(m_SlowdownTime, m_SlowStrength);
 			UGameplayStatics::PlayWorldCameraShake(GetWorld(), UObstacleCameraShake::StaticClass(), playerHandcar->GetActorLocation(),
 				0.0, playerHandcar->GetCurrentSpeed() * m_CameraShakeStrength);
 

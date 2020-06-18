@@ -20,7 +20,7 @@ AScorpionAIController::AScorpionAIController()
 
 	_AIPerceptionComp->ConfigureSense(*_SightConfig);
 
-	// Assign to Team 1
+	// Assign to Team 1. Player will be on default team so they will be viewed as enemies.
 	SetGenericTeamId(FGenericTeamId(1));
 }
 
@@ -32,7 +32,6 @@ void AScorpionAIController::BeginPlay()
 void AScorpionAIController::OnPossess(APawn * InPawn)
 {
 	Super::Super::OnPossess(InPawn);
-
 
 	// Get the possessed Pawn. If it's the AI Character we created
 	// initialize it's blackboard and start it's corresponding behavior tree
@@ -49,7 +48,7 @@ void AScorpionAIController::OnPossess(APawn * InPawn)
 
 		_BlackboardComp->SetValueAsFloat(_AttackRadiusBlackboardKey, scorpion->m_SightRadius);
 
-		// Configure sight config based off of cactus settings
+		// Configure sight config based off of default settings
 		_SightConfig->SightRadius = scorpion->m_SightRadius;
 		_SightConfig->LoseSightRadius = scorpion->m_LoseSightRadius;
 		_SightConfig->PeripheralVisionAngleDegrees = scorpion->m_VisionAngle;
@@ -71,9 +70,4 @@ void AScorpionAIController::EvaulateNextTargetPoint()
 		// add target point to end of queue to continue circular link
 		scorpion->GetTargetPoints()->Enqueue(targetPoint);
 	}
-}
-
-bool AScorpionAIController::TailAttack()
-{
-	return false;
 }

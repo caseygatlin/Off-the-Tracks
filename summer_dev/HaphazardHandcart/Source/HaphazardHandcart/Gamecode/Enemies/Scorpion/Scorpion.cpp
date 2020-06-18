@@ -81,6 +81,7 @@ void AScorpion::BeginOverlap(UPrimitiveComponent * OverlappedComponent, AActor *
 			UDebugFunctionLibrary::DebugPrintScreen(debugText, 2.0f, FColor::Red);
 		}
 
+		// slow down the hit player handcar and apply camera shake
 		playerHandcar->SlowdownPlayer(m_SlowdownTime, m_SlowStrength);
 		UGameplayStatics::PlayWorldCameraShake(GetWorld(), UObstacleCameraShake::StaticClass(), playerHandcar->GetActorLocation(),
 			0.0, playerHandcar->GetCurrentSpeed() * m_CameraShakeStrength);
@@ -89,6 +90,7 @@ void AScorpion::BeginOverlap(UPrimitiveComponent * OverlappedComponent, AActor *
 
 void AScorpion::InitalizeTargetPointsQueue()
 {
+	// add all target points from the set to a circular queue
 	int32 numTargets = _ScorpionTargetPointsSet.Num();
 	_ScorpionTargetPointsQueue = new TCircularQueue<ATargetPoint *>(numTargets + 1);
 	for (ATargetPoint * target : _ScorpionTargetPointsSet)

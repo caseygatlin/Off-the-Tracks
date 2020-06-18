@@ -15,6 +15,7 @@ UBTService_UnsetBBValue::UBTService_UnsetBBValue()
 	BlackboardKey.AddBoolFilter(this, GET_MEMBER_NAME_CHECKED(UBTService_UnsetBBValue, BlackboardKey));
 }
 
+// Will tick for delta seconds and then clear bool/object for owning ai controllers blackboard value
 void UBTService_UnsetBBValue::TickNode(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory, float DeltaSeconds)
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);

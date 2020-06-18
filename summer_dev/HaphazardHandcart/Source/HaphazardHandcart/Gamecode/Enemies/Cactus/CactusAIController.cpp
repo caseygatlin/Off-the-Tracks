@@ -129,9 +129,9 @@ bool ACactusAIController::FireSpike(UAnimationAsset * i_LeftFireAnimation, UAnim
 		spawnTransform.SetLocation(spawnLocation);
 		spawnTransform.SetRotation(cactus->GetActorRotation().Quaternion());
 
+		// spawn a spike projectile and set its life span, amount it slows down the player and the strength it slows down the player
 		ASpikeProjectile * spike = GetWorld()->SpawnActor<ASpikeProjectile>(ASpikeProjectile::StaticClass(), spawnTransform, spawnSpikeParams);
 		spike->SetLifeSpan(cactus->m_SpikeTimeToLive);
-
 		spike->m_SlowdownTime = cactus->m_SpikeSlowdownTime;
 		spike->m_SlowStrength = cactus->m_SpikeSlowStrength;
 		spike->m_PrintDebugStrings = cactus->m_PrintDebugStrings;
@@ -139,7 +139,6 @@ bool ACactusAIController::FireSpike(UAnimationAsset * i_LeftFireAnimation, UAnim
 		if (spike != nullptr)
 		{
 			spike->LaunchProjectile(cactus->m_SpikeLaunchSpeed);
-
 			return true;
 		}
 	}
