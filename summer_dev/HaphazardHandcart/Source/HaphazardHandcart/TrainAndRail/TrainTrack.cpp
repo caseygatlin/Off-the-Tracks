@@ -840,9 +840,11 @@ void ATrainTrack::UpdateConnectionArrows()
 		FS_TrackSpline currentSpline = _TrackSplines[i];
 		if (m_DefaultTrackSpline == currentSpline.Spline)
 		{
-			bool nonConnectedTrack = currentSpline.StartConnectionPoint.Connections.Num() == 0 && currentSpline.EndConnectionPoint.Connections.Num() == 0;
-			UpdateConnectionArrow(m_DefaultTrackSpline, _StartConnectionArrow, nonConnectedTrack || m_AlwaysShowConnectionArrows);
-			UpdateConnectionArrow(m_DefaultTrackSpline, _EndConnectionArrow, nonConnectedTrack || m_AlwaysShowConnectionArrows);
+			// display start or end connection arrow if they have no connections
+			UpdateConnectionArrow(m_DefaultTrackSpline, _StartConnectionArrow, 
+				currentSpline.StartConnectionPoint.Connections.Num() == 0 || m_AlwaysShowConnectionArrows);
+			UpdateConnectionArrow(m_DefaultTrackSpline, _EndConnectionArrow, 
+				currentSpline.EndConnectionPoint.Connections.Num() == 0 || m_AlwaysShowConnectionArrows);
 		}
 	}
 }
