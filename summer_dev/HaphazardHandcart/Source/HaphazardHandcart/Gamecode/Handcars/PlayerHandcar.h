@@ -5,7 +5,7 @@
 #include "TrainAndRail/Handcar.h"
 #include "Gamecode/E_CustomEnums.h"
 #include "GenericTeamAgentInterface.h"
-
+#include "Math/NumericLimits.h"
 #include "PlayerHandcar.generated.h"
 
 class AJumpTrigger;
@@ -70,12 +70,20 @@ public:
 		void Pump(const float i_AxisVal);
 
 	UFUNCTION(BlueprintCallable, Category = "TrainAndRail|Handcar|PlayerHandcar|Pumping")
+		//Behaves exactly as the normal Pump() function but is not tied to input. Used to simulated input from inside the game.
+		void NonInputPump(const float i_AxisVal);
+
+	UFUNCTION(BlueprintCallable, Category = "TrainAndRail|Handcar|PlayerHandcar|Pumping")
 		// Pumps the cart for a percentage of the max pump time
 		void ApplyPump(const float i_PumpStrength);
 
 	UFUNCTION(BlueprintCallable, Category = "TrainAndRail|Handcar|PlayerHandcar|Pumping")
 		// Checks if gyro input should trigger a pump
 		void CheckInputAndPumpIfNeeded();
+
+	UFUNCTION(BlueprintCallable, Category = "TrainAndRail|Handcar|PlayerHandcar|Pumping")
+		//Handles movement in the non pumping control scheme.
+		void HandleNonPumpingMotion(const float i_deltaTime);
 
 #pragma endregion
 
@@ -248,6 +256,22 @@ public:
 		// The acceleration applied while pumping the handcar.
 		float m_PumpAcceleration = 5000.f;
 
+	
+
+#pragma endregion
+
+#pragma region Direct Movement Settings
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Direct Movement Settings|Player Handcar")
+		// The fastest time in seconds the cart pumps itself in direct movement mode. 
+		float m_MinTimeBetweenPumps = .4f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Direct Movement Settings|Player Handcar")
+		// The slowest time in seconds the cart pumps itself in direct movement mode. 
+		float m_MaxTimeBetweenPumps = 1.4f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Direct Movement Settings|Player Handcar")
+		// The time in seconds the move button must be held to reach the fastest speed (MinTimeBetweenPumps)
+		float m_DirectMovementSpeedUpTime = 2.0f;
 #pragma endregion
 
 #pragma region Sparks Settings
@@ -425,7 +449,20 @@ private:
 		// The current Speed state of the cart.
 		// [SLOW, MEDIUM, FAST]
 		E_CartSpeedState _CartSpeedState = E_CartSpeedState::SLOW;
+
+
 	
+
+#pragma endregion
+
+#pragma region Direct Movement Settings
+	UPROPERTY(VisibleAnywhere, Category = "Direct Movement Settings|Player Handcar")
+		// Is the move button being held down?
+		bool _MoveButtonHeld = false;
+
+	UPROPERTY(VisibleAnywhere, Category = "Direct Movement Settings|Player Handcar")
+		// How long has the move button been held? 
+		float _TimeMoveButtonHeld = TNumericLimits<float>::Max();//Init to max so the first button press pumps
 
 #pragma endregion
 
@@ -475,7 +512,7 @@ private:
 		float _CurrentPumpAcceleration = 0.f;
 
 	UPROPERTY(VisibleAnywhere, Category = "Pump Settings|Player Handcar")
-		// Input axis value
+		// Direction of the last pump
 		float _InputAxis = 0.f;
 
 #pragma endregion

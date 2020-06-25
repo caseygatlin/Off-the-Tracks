@@ -103,6 +103,7 @@ void APlayerHandcar::BeginPlay()
 
 void APlayerHandcar::Tick(float DeltaTime)
 {
+	
 	if (!m_IsJumping)
 	{
 		Super::Tick(DeltaTime);
@@ -110,6 +111,7 @@ void APlayerHandcar::Tick(float DeltaTime)
 		_TimeSinceLastPump += DeltaTime;
 
 		MoveIfStopped();
+		HandleNonPumpingMotion(DeltaTime);
 		UpdateMovement(DeltaTime);
 
 		CheckLeanStateForSparks();
@@ -121,8 +123,7 @@ void APlayerHandcar::Tick(float DeltaTime)
 	}
 	else
 	{
-		Super::Super::Tick(DeltaTime);
-
+		Super::Super::Tick(DeltaTime);	
 		if (m_IsRotating)
 		{
 			// Set rotating start time
@@ -227,8 +228,11 @@ void APlayerHandcar::UpdateHandleRotation(float i_TargetRotation)
 {
 	float pitch = m_Handle->GetRelativeRotation().Pitch;
 	_LastValidDelta = i_TargetRotation - pitch;
+	float rotationAlpha = FMath::Clamp(_TimeSinceLastPump / _AveragePumpTime, 0.0f, 1.0f);
 
-	FRotator handleRotation = FRotator(i_TargetRotation, 0.f, 0.f);
+	float lerpedAngle = FMath::Lerp(pitch, i_TargetRotation, rotationAlpha);
+
+	FRotator handleRotation = FRotator(lerpedAngle, 0.f, 0.f);
 	m_Handle->SetRelativeRotation(handleRotation);
 }
 
@@ -283,57 +287,72 @@ void APlayerHandcar::CheckLeanStateForSparks()
 
 void APlayerHandcar::HandleGyroPump(float i_AxisVal)
 {
-	float maxAngle = 70;
-	AveragePumpValues();
+#pragma region OLD_GYRO_MOVEMENT 
+	//float maxAngle = 70;
+	//AveragePumpValues();
 
-	bool useNewCode = true;
-	if (!useNewCode)
-	{
-		//PREVIOUS WORKING CODE
-			//TODO: Remove once code below is finalized. 
-		const float pumpLeftThreshold = 0.6f;
-		const float pumprightThreshold = 0.4f;
-		const float pumpLeftAxisVal = -1.f;
-		const float pumpRightAxisVal = 1.f;
+	//bool useNewCode = true;
+	//if (!useNewCode)
+	//{
+	//	//PREVIOUS WORKING CODE
+	//		//TODO: Remove once code below is finalized. 
+	//	const float pumpLeftThreshold = 0.6f;
+	//	const float pumprightThreshold = 0.4f;
+	//	const float pumpLeftAxisVal = -1.f;
+	//	const float pumpRightAxisVal = 1.f;
 
-		if (i_AxisVal > pumpLeftThreshold)
-		{
-			Pump(pumpLeftAxisVal);
-		}
-		else if (i_AxisVal < pumprightThreshold)
-		{
-			Pump(pumpRightAxisVal);
-		}
-		///////////////////////////////////////////
-	}
-	else
-	{
-		float absoluteDistanceFromCenter = abs(.5 - i_AxisVal) * 2;
-		float targetRotation = absoluteDistanceFromCenter * maxAngle;
-		float signedHandleDelta = 0.0f;
-		// Any value larger than this gets culled
-		float deltaThreshold = .9f;
+	//	if (i_AxisVal > pumpLeftThreshold)
+	//	{
+	//		Pump(pumpLeftAxisVal);
+	//	}
+	//	else if (i_AxisVal < pumprightThreshold)
+	//	{
+	//		Pump(pumpRightAxisVal);
+	//	}
+	//	///////////////////////////////////////////
+	//}
+	//else
+	//{
+	//	float absoluteDistanceFromCenter = abs(.5 - i_AxisVal) * 2;
+	//	float targetRotation = absoluteDistanceFromCenter * maxAngle;
+	//	float signedHandleDelta = 0.0f;
+	//	// Any value larger than this gets culled
+	//	float deltaThreshold = .9f;
 
-		if (i_AxisVal > .5f)
-		{
-			targetRotation *= -1;
-		}
+	//	if (i_AxisVal > .5f)
+	//	{
+	//		targetRotation *= -1;
+	//	}
 
-		signedHandleDelta = _LastHandlePosition - i_AxisVal;
-		_LastHandlePosition = i_AxisVal;
+	//	signedHandleDelta = _LastHandlePosition - i_AxisVal;
+	//	_LastHandlePosition = i_AxisVal;
 
-		if (abs(signedHandleDelta) <= deltaThreshold)
-		{
-			UpdateHandleRotation(targetRotation);
-		}
-		CheckInputAndPumpIfNeeded();
-	}
+	//	if (abs(signedHandleDelta) <= deltaThreshold)
+	//	{
+	//		UpdateHandleRotation(targetRotation);
+	//	}
+	//	CheckInputAndPumpIfNeeded();
+	//}
+#pragma endregion
+
 }
 
 void APlayerHandcar::Pump(float i_AxisVal)
-{
-	_InputAxis = i_AxisVal;
+{	
+	
+	if (i_AxisVal != 0)
+	{
+		_MoveButtonHeld = true;
+	}
+	else
+	{
+		_MoveButtonHeld = false;
+	}
 
+	//THE FOLLOWING CODE HAS BEEN MOVED TO NonInputPump()
+	//TODO: Remove from here once NonInputPump() has been tested
+	/*
+	_InputAxis = i_AxisVal;
 	float targetRotation = i_AxisVal * m_MaxHandleAngle;
 
 	UpdateHandleRotation(targetRotation);
@@ -348,6 +367,52 @@ void APlayerHandcar::Pump(float i_AxisVal)
 		_IsRightHandleDown = true;
 		SetPumpValues();
 	}
+	*/
+}
+
+void APlayerHandcar::NonInputPump(float i_AxisVal)
+{
+	_InputAxis = i_AxisVal;
+	float targetRotation = i_AxisVal * m_MaxHandleAngle;
+
+	
+
+	if (i_AxisVal <= m_PumpThreshold * -1.f && _IsRightHandleDown)
+	{
+		_IsRightHandleDown = false;
+		SetPumpValues();
+	}
+	else if (i_AxisVal >= m_PumpThreshold && !_IsRightHandleDown)
+	{
+		_IsRightHandleDown = true;
+		SetPumpValues();
+	}
+}
+
+void APlayerHandcar::HandleNonPumpingMotion(const float i_deltaTime)
+{
+	if (_MoveButtonHeld)
+	{
+		_TimeMoveButtonHeld += i_deltaTime;
+		_TimeMoveButtonHeld = FMath::Min(_TimeMoveButtonHeld, m_DirectMovementSpeedUpTime);
+
+		float lerpAlpha = _TimeMoveButtonHeld / m_DirectMovementSpeedUpTime;
+		lerpAlpha > 1 ? 1 : lerpAlpha;
+		float timeGoal = FMath::Lerp(m_MaxTimeBetweenPumps, m_MinTimeBetweenPumps, lerpAlpha);		
+		float nextAxis = _InputAxis == 1 ? -1 : 1;
+		
+		if (_TimeSinceLastPump > timeGoal)
+		{			
+			NonInputPump(nextAxis);
+		}
+		UpdateHandleRotation(_InputAxis * m_MaxHandleAngle);
+	}
+	else
+	{
+		_TimeMoveButtonHeld = 0;
+	}
+
+	
 }
 
 void APlayerHandcar::ApplyPump(const float i_PumpStrength)
