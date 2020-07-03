@@ -1,6 +1,6 @@
 # Description
 
-Off the Tracks is a cooperative on-rails race to the finish where you control your cart using a manually pumped railroad handcar.
+Off the Tracks is a cooperative on-rails race to the finish where you control your cart using a manually pumped railroad handcar. This game was developed by myself and 10 other awesome people. It is currently in development for a Steam release, check us out on Twitter [@_Offthetracks](https://twitter.com/_OfftheTracks) for updates.
 
 # Contributions
 
